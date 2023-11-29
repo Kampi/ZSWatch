@@ -98,6 +98,66 @@ int zsw_environment_sensor_get(float *temperature, float *humidity, float *press
     return 0;
 }
 
+int zsw_environment_sensor_get_temperature(float *temperature)
+{
+    struct sensor_value sensor_val;
+
+    if (!device_is_ready(bme688)) {
+        return -ENODEV;
+    }
+
+    if (sensor_sample_fetch(bme688) != 0) {
+        return -ENODATA;
+    }
+
+    if (sensor_channel_get(bme688, SENSOR_CHAN_AMBIENT_TEMP, &sensor_val) != 0) {
+        return -ENODATA;
+    }
+    *temperature = sensor_value_to_float(&sensor_val);
+
+    return 0;
+}
+
+int zsw_environment_sensor_get_humidity(float *humidity)
+{
+    struct sensor_value sensor_val;
+
+    if (!device_is_ready(bme688)) {
+        return -ENODEV;
+    }
+
+    if (sensor_sample_fetch(bme688) != 0) {
+        return -ENODATA;
+    }
+
+    if (sensor_channel_get(bme688, SENSOR_CHAN_HUMIDITY, &sensor_val) != 0) {
+        return -ENODATA;
+    }
+    *humidity = sensor_value_to_float(&sensor_val);
+
+    return 0;
+}
+
+int zsw_environment_sensor_get_pressure(float *pressure)
+{
+    struct sensor_value sensor_val;
+
+    if (!device_is_ready(bme688)) {
+        return -ENODEV;
+    }
+
+    if (sensor_sample_fetch(bme688) != 0) {
+        return -ENODATA;
+    }
+
+    if (sensor_channel_get(bme688, SENSOR_CHAN_PRESS, &sensor_val) != 0) {
+        return -ENODATA;
+    }
+    *pressure = sensor_value_to_float(&sensor_val);
+
+    return 0;
+}
+
 int zsw_environment_sensor_get_iaq(float *iaq)
 {
     struct sensor_value sensor_val;

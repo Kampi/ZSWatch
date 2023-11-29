@@ -52,11 +52,6 @@ static void sensors_summary_app_stop(void)
     sensors_summary_ui_remove();
 }
 
-static double get_relative_height_m(double relative_pressure, double new_pressure, double temperature)
-{
-    return ((powf((relative_pressure / new_pressure), 1.f / 5.257f) - 1.f) * (temperature + 273.15f)) / 0.0065f;
-}
-
 static void timer_callback(lv_timer_t *timer)
 {
     float temperature = 0.0;
@@ -78,7 +73,7 @@ static void timer_callback(lv_timer_t *timer)
     sensors_summary_ui_set_iaq(iaq);
     sensors_summary_ui_set_co2(co2);
     sensors_summary_ui_set_light(light);
-    sensors_summary_ui_set_rel_height(get_relative_height_m(relative_pressure, pressure, temperature));
+    sensors_summary_ui_set_rel_height(zsw_pressure_get_relative_height_m(relative_pressure, pressure, temperature));
 }
 
 static void on_close_sensors_summary(void)

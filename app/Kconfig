@@ -55,6 +55,11 @@ menu "ZSWatch"
         default n
         select APPLICATIONS_USE_ACCELEROMETER
 
+        config APPLICATIONS_USE_ALTIMETER
+            bool
+        prompt "Activate the application 'Altimeter'"
+        default y
+
         config APPLICATIONS_USE_IAQ
             bool
         prompt "Activate the application 'IAQ'"
@@ -218,5 +223,6 @@ menu "ZSWatch"
         rsource "src/applications/template/Kconfig"
         rsource "src/applications/trivia/Kconfig"
         rsource "src/applications/ppt_remote/Kconfig"
+        rsource "src/applications/altimeter/Kconfig"
     endmenu
 endmenu

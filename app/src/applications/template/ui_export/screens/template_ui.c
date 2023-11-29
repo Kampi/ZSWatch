@@ -11,15 +11,18 @@ void template_ui_show(lv_obj_t *root, on_ui_increment_cb_t close_cb)
 {
     lv_obj_t *float_btn;
 
-    assert(root_page == NULL);
+    assert(root == NULL);
+
+    root_page = lv_obj_create(root);
+    lv_obj_set_style_border_width(root_page, 0, LV_PART_MAIN);
+    lv_obj_set_size(root_page, LV_PCT(100), LV_PCT(100));
+
+    lv_obj_clear_flag(root_page, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(root_page, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(root_page, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     close_callback = close_cb;
 
-    // Create the root container
-    root_page = lv_obj_create(root);
-    // Remove the default border
-    lv_obj_set_style_border_width(root_page, 0, LV_PART_MAIN);
-    // Make root container fill the screen
-    lv_obj_set_size(root_page, LV_PCT(100), LV_PCT(100));
     // Don't want it to be scollable. Putting anything close the edges
     // then LVGL automatically makes the page scrollable and shows a scroll bar.
     // Does not loog very good on the round display.

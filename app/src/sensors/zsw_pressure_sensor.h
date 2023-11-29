@@ -19,7 +19,16 @@
 
 #include <zephyr/drivers/sensor.h>
 
+#include <math.h>
+
 #include "../../drivers/sensor/bmp581/bosch_bmp581.h"
+
+inline __attribute__((always_inline)) float zsw_pressure_get_relative_height_m(float relative_pressure,
+                                                                               float new_pressure,
+                                                                               float temperature)
+{
+    return ((powf((relative_pressure / new_pressure), 1.f / 5.257f) - 1.f) * (temperature + 273.15f)) / 0.0065f;
+}
 
 int zsw_pressure_sensor_init(void);
 
