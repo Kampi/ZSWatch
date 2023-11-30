@@ -1,7 +1,11 @@
-#include <zephyr/kernel.h>
 #include <zephyr/init.h>
+#include <zephyr/kernel.h>
+#include <zephyr/kernel_version.h>
+
+#include <string.h>
 
 #include "about_ui.h"
+#include "app_version.h"
 #include "managers/zsw_app_manager.h"
 
 static void about_app_start(lv_obj_t *root, lv_group_t *group);
@@ -18,7 +22,15 @@ static application_t app = {
 
 static void about_app_start(lv_obj_t *root, lv_group_t *group)
 {
-    about_ui_show(root);
+    char version_string[16];
+    char app_string[16];
+    uint32_t version = sys_kernel_version_get();
+
+    sprintf(version_string, "Kernel:\t%u.%u.%u", SYS_KERNEL_VER_MAJOR(version), SYS_KERNEL_VER_MINOR(version),
+            SYS_KERNEL_VER_PATCHLEVEL(version));
+    sprintf(app_string, "App:\t%s", APP_VERSION_STRING);
+
+    about_ui_show(root, version_string, app_string);
 }
 
 static void about_app_stop(void)

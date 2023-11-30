@@ -1,5 +1,7 @@
 #include "../altimeter_ui.h"
 
+#define ALTIMETER_UI_POINT_COUNT                16
+
 static lv_obj_t *ui_root_page = NULL;
 static lv_obj_t *ui_ChartAltitude;
 static lv_obj_t *ui_ButtonReference;
@@ -24,12 +26,16 @@ void altimeter_ui_show(lv_obj_t *p_parent)
     lv_obj_set_width(ui_ChartAltitude, 160);
     lv_obj_set_height(ui_ChartAltitude, 100);
     lv_obj_set_align(ui_ChartAltitude, LV_ALIGN_CENTER);
-    lv_chart_set_update_mode(ui_ChartAltitude, LV_CHART_UPDATE_MODE_SHIFT);
-    lv_chart_set_type(ui_ChartAltitude, LV_CHART_TYPE_LINE);
-    lv_chart_set_range(ui_ChartAltitude, LV_CHART_AXIS_PRIMARY_Y, -1, 10);
+    lv_chart_set_update_mode(ui_ChartAltitude, LV_CHART_UPDATE_MODE_CIRCULAR);
+    lv_chart_set_point_count(ui_ChartAltitude, ALTIMETER_UI_POINT_COUNT);
+    lv_chart_set_range(ui_ChartAltitude, LV_CHART_AXIS_PRIMARY_Y, -1, 1);
     lv_chart_set_axis_tick(ui_ChartAltitude, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
     lv_chart_set_axis_tick(ui_ChartAltitude, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
     ui_ChartAltitude_series = lv_chart_add_series(ui_ChartAltitude, lv_color_hex(0x808080), LV_CHART_AXIS_PRIMARY_Y);
+
+    for (uint32_t i = 0; i < ALTIMETER_UI_POINT_COUNT; i++) {
+        lv_chart_set_next_value(ui_ChartAltitude, ui_ChartAltitude_series, 0);
+    }
 
     ui_ButtonReference = lv_btn_create(ui_root_page);
     lv_obj_set_width(ui_ButtonReference, 100);
@@ -55,19 +61,37 @@ void altimeter_ui_remove(void)
     ui_root_page = NULL;
 }
 
-void altimeter_ui_add_data(lv_coord_t data)
+void altimeter_ui_add_data(lv_coord_t datapoint)
 {
-    lv_chart_series_t *ser = lv_chart_get_series_next(ui_ChartAltitude, NULL);
+    uint16_t points;
+    uint16_t start;
+    lv_coord_t *datapoints;
+    lv_coord_t max;
+    lv_coord_t min;
 
-    lv_chart_set_next_value(ui_ChartAltitude, ser, data);
+    max = 1;
+    min = -1;
 
-    uint16_t p = lv_chart_get_point_count(ui_ChartAltitude);
-    uint16_t s = lv_chart_get_x_start_point(ui_ChartAltitude, ser);
-    lv_coord_t *a = lv_chart_get_y_array(ui_ChartAltitude, ser);
+    lv_chart_set_next_value(ui_ChartAltitude, ui_ChartAltitude_series, datapoint);
 
-    a[(s + 1) % p] = LV_CHART_POINT_NONE;
-    a[(s + 2) % p] = LV_CHART_POINT_NONE;
-    a[(s + 2) % p] = LV_CHART_POINT_NONE;
+    points = lv_chart_get_point_count(ui_ChartAltitude);
+    datapoints = lv_chart_get_y_array(ui_ChartAltitude, ui_ChartAltitude_series);
+    for (uint32_t i = 0; i < points; i++) {
+        if (datapoints[i] != LV_CHART_POINT_NONE) {
+            if (datapoints[i] > max) {
+                max = datapoints[i];
+            } else if (datapoints[i] < min) {
+                min = datapoints[i];
+            }
+        }
+    }
+    lv_chart_set_range(ui_ChartAltitude, LV_CHART_AXIS_PRIMARY_Y, min, max);
+
+    start = lv_chart_get_x_start_point(ui_ChartAltitude, ui_ChartAltitude_series);
+
+    datapoints[(start + 1) % points] = LV_CHART_POINT_NONE;
+    datapoints[(start + 2) % points] = LV_CHART_POINT_NONE;
+    datapoints[(start + 2) % points] = LV_CHART_POINT_NONE;
 
     lv_chart_refresh(ui_ChartAltitude);
 }

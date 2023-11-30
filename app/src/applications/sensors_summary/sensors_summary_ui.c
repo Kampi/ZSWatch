@@ -47,7 +47,7 @@ static void create_ui(lv_obj_t *parent)
     lv_obj_set_x(pressure_label, 45);
     lv_obj_set_y(pressure_label, -85);
     lv_obj_set_align(pressure_label, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(pressure_label, "Pressure: ");
+    lv_label_set_text(pressure_label, "Pressure:");
 
     humidity_label = lv_label_create(parent);
     lv_obj_set_width(humidity_label, LV_SIZE_CONTENT);
@@ -76,7 +76,7 @@ static void create_ui(lv_obj_t *parent)
     iaq_label = lv_label_create(parent);
     lv_obj_set_width(iaq_label, LV_SIZE_CONTENT);
     lv_obj_set_height(iaq_label, LV_SIZE_CONTENT);
-    lv_obj_set_x(iaq_label, 5);
+    lv_obj_set_x(iaq_label, 0);
     lv_obj_set_y(iaq_label, -5);
     lv_obj_set_align(iaq_label, LV_ALIGN_LEFT_MID);
     lv_label_set_text(iaq_label, "IAQ:");
@@ -84,7 +84,7 @@ static void create_ui(lv_obj_t *parent)
     light_label = lv_label_create(parent);
     lv_obj_set_width(light_label, LV_SIZE_CONTENT);
     lv_obj_set_height(light_label, LV_SIZE_CONTENT);
-    lv_obj_set_x(light_label, 5);
+    lv_obj_set_x(light_label, 0);
     lv_obj_set_y(light_label, 15);
     lv_obj_set_align(light_label, LV_ALIGN_LEFT_MID);
     lv_label_set_text(light_label, "Light:");

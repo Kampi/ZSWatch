@@ -35,9 +35,11 @@ static void on_Timer_Callback(lv_timer_t *timer)
     zsw_pressure_sensor_get_pressure(&pressure);
     height = zsw_pressure_get_relative_height_m(relative_pressure, pressure, temperature);
 
-    LOG_DBG("Relative height: %f", height);
+    int16_t a;
+    a = lv_rand(-10, 20);
+    LOG_DBG("Relative height: %i", a);
 
-    altimeter_ui_add_data(height);
+    altimeter_ui_add_data(a);
 }
 
 static void altimeter_app_start(lv_obj_t *root, lv_group_t *group)
