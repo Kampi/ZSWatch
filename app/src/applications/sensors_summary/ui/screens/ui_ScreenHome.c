@@ -38,7 +38,7 @@ static void on_ButtonHumidity_Clicked(lv_event_t *e)
     }
 }
 
-lv_obj_t* Sensors_Summary_HomeScreen_Init(void)
+lv_obj_t *Sensors_Summary_HomeScreen_Init(void)
 {
     root_page = lv_obj_create(NULL);
 
@@ -50,31 +50,34 @@ lv_obj_t* Sensors_Summary_HomeScreen_Init(void)
     ui_ButtonTemperature = lv_btn_create(root_page);
     lv_obj_set_width(ui_ButtonTemperature, 50);
     lv_obj_set_height(ui_ButtonTemperature, 50);
-    lv_obj_set_x(ui_ButtonTemperature, -41);
-    lv_obj_set_y(ui_ButtonTemperature, -44);
+    lv_obj_set_x(ui_ButtonTemperature, -40);
+    lv_obj_set_y(ui_ButtonTemperature, -40);
     lv_obj_set_align(ui_ButtonTemperature, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ButtonTemperature, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(ui_ButtonTemperature, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ui_ButtonTemperature, lv_color_hex(0x9EC8F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_ButtonTemperature, &ui_img_925774327, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ButtonPressure = lv_btn_create(root_page);
     lv_obj_set_width(ui_ButtonPressure, 50);
     lv_obj_set_height(ui_ButtonPressure, 50);
-    lv_obj_set_x(ui_ButtonPressure, 49);
-    lv_obj_set_y(ui_ButtonPressure, -44);
+    lv_obj_set_x(ui_ButtonPressure, 40);
+    lv_obj_set_y(ui_ButtonPressure, -40);
     lv_obj_set_align(ui_ButtonPressure, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ButtonPressure, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(ui_ButtonPressure, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ui_ButtonPressure, lv_color_hex(0x9EC8F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_ButtonPressure, &ui_img_1463213690, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ButtonHumidity = lv_btn_create(root_page);
     lv_obj_set_width(ui_ButtonHumidity, 50);
     lv_obj_set_height(ui_ButtonHumidity, 50);
-    lv_obj_set_x(ui_ButtonHumidity, -42);
-    lv_obj_set_y(ui_ButtonHumidity, 35);
+    lv_obj_set_x(ui_ButtonHumidity, -40);
+    lv_obj_set_y(ui_ButtonHumidity, 40);
     lv_obj_set_align(ui_ButtonHumidity, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ButtonHumidity, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(ui_ButtonHumidity, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ui_ButtonHumidity, lv_color_hex(0x9EC8F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_ButtonHumidity, &ui_img_1479496048, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ButtonTemperature, on_ButtonTemperature_Clicked, LV_EVENT_CLICKED, NULL);
