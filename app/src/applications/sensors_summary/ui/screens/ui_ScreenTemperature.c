@@ -7,6 +7,60 @@ static lv_obj_t *chart;
 static lv_chart_series_t *series_list;
 static lv_timer_t *timer;
 
+static int counter = 0;
+static int16_t testsignal[] = {
+20,
+23,
+25,
+27,
+30,
+32,
+34,
+35,
+37,
+38,
+39,
+40,
+40,
+40,
+40,
+39,
+38,
+37,
+35,
+34,
+32,
+30,
+27,
+25,
+23,
+20,
+18,
+15,
+13,
+10,
+8,
+6,
+5,
+3,
+2,
+1,
+0,
+0,
+0,
+0,
+1,
+2,
+3,
+5,
+6,
+8,
+10,
+13,
+15,
+17,
+};
+
 static void draw_event_cb(lv_event_t *e)
 {
     lv_obj_t *obj = lv_event_get_target(e);
@@ -29,7 +83,7 @@ static void draw_event_cb(lv_event_t *e)
 
         lv_draw_rect_dsc_init(&draw_rect_dsc);
         draw_rect_dsc.bg_opa = LV_OPA_50;
-        draw_rect_dsc.bg_color = lv_color_hex(0x30343F);
+        draw_rect_dsc.bg_color = lv_color_hex(0x9EC8F6);
 
         lv_area_t a;
         a.x1 = dsc->p1->x;
@@ -48,7 +102,8 @@ static void draw_event_cb(lv_event_t *e)
 static void add_data(lv_timer_t *timer)
 {
     LV_UNUSED(timer);
-    lv_chart_set_next_value(chart, series_list, lv_rand(-20, 60));
+    lv_chart_set_next_value(chart, series_list, testsignal[counter++]);
+    counter = counter % 50;
 }
 
 lv_obj_t *Sensors_Summary_TemperatureScreen_Init(void)
@@ -61,13 +116,13 @@ lv_obj_t *Sensors_Summary_TemperatureScreen_Init(void)
     lv_obj_set_style_bg_color(root_page, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
 
     chart = lv_chart_create(root_page);
-    lv_obj_set_size(chart, 250, 110);
-    lv_obj_set_pos(chart, 0, 120);
+    lv_obj_set_size(chart, 260, 200);
+    lv_obj_set_pos(chart, -10, 60);
     lv_obj_set_style_line_width(chart, 0, LV_PART_ITEMS);
     lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
 
-    lv_obj_set_style_bg_color(chart, lv_color_hex(0x9EC8F6), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(chart, lv_color_hex(0x9EC8F6), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(chart, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(chart, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
@@ -79,7 +134,7 @@ lv_obj_t *Sensors_Summary_TemperatureScreen_Init(void)
 
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 0, 5, 5, true, 50);
 
-    series_list = lv_chart_add_series(chart, lv_color_hex(0x30343F), LV_CHART_AXIS_SECONDARY_Y);
+    series_list = lv_chart_add_series(chart, lv_color_hex(0x9EC8F6), LV_CHART_AXIS_SECONDARY_Y);
 
     timer = lv_timer_create(add_data, 100, NULL);
 
