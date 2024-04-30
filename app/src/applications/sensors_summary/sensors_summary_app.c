@@ -20,6 +20,9 @@ static void zbus_pressure_sample_callback(const struct zbus_channel *chan);
 
 static void timer_callback(lv_timer_t *timer);
 
+static uint32_t Counter = 0;
+static lv_timer_t* RefreshTimer;
+
 LOG_MODULE_REGISTER(sensors_summary, LOG_LEVEL_DBG);
 
 ZSW_LV_IMG_DECLARE(move);
@@ -52,6 +55,8 @@ static void sensors_summary_app_start(lv_obj_t *root, lv_group_t *group)
     zbus_chan_add_obs(&environment_data_chan, &environment_observer, K_NO_WAIT);
     zbus_chan_add_obs(&light_data_chan, &light_observer, K_NO_WAIT);
     zbus_chan_add_obs(&pressure_data_chan, &pressure_observer, K_NO_WAIT);
+
+    RefreshTimer = lv_timer_create(timer_callback, 1000, NULL);
 }
 
 static void sensors_summary_app_stop(void)
@@ -60,7 +65,7 @@ static void sensors_summary_app_stop(void)
     // TODO need mechanism so that multiple user can request ODR without
     // breaking for another when changed.
     //zsw_pressure_sensor_set_odr(BOSCH_BMP581_ODR_DEFAULT);
-    //lv_timer_del(refresh_timer);
+    lv_timer_del(RefreshTimer);
     //sensors_summary_ui_remove();
 
     zbus_chan_rm_obs(&environment_data_chan, &environment_observer, K_NO_WAIT);
@@ -97,7 +102,8 @@ static double get_relative_height_m(double relative_pressure, double new_pressur
 
 static void timer_callback(lv_timer_t *timer)
 {
-
+    printf("Timer\n\r");
+    Sensors_Summary_TemperatureScreen_Add(Counter++);
 }
 
 static void on_ref_set(void)

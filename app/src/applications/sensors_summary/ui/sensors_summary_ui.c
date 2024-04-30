@@ -31,26 +31,31 @@ void Sensors_Summary_UI_ChangeScreen(Sensors_Summary_Screen_t Screen)
 {
     lv_obj_t *page;
 
+    if(CurrentScreen == Screen)
+    {
+        return;
+    }
+
     CurrentScreen = Screen;
 
     switch(CurrentScreen)
     {
-        case SENSORS_SUMMARY_SCREEN_TEMPERATURE: {
-            page = root_page_temperature;
-            break;
-        }
-        case SENSORS_SUMMARY_SCREEN_HUMIDITY: {
-            page = root_page_humidity;
-            break;
-        }
-        case SENSORS_SUMMARY_SCREEN_PRESSURE: {
-            page = root_page_pressure;
-            break;
-        }
-        default: {
-            page = root_page_home;
-            break;
-        }
+    case SENSORS_SUMMARY_SCREEN_TEMPERATURE: {
+        page = root_page_temperature;
+        break;
+    }
+    case SENSORS_SUMMARY_SCREEN_HUMIDITY: {
+        page = root_page_humidity;
+        break;
+    }
+    case SENSORS_SUMMARY_SCREEN_PRESSURE: {
+        page = root_page_pressure;
+        break;
+    }
+    default: {
+        page = root_page_home;
+        break;
+    }
     }
 
     lv_scr_load_anim(page, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, false);
@@ -58,5 +63,5 @@ void Sensors_Summary_UI_ChangeScreen(Sensors_Summary_Screen_t Screen)
 
 Sensors_Summary_Screen_t Sensors_Summary_UI_GetCurrentScreen(void)
 {
-    return CurrentScreen;   
+    return CurrentScreen;
 }

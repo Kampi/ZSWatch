@@ -3,89 +3,42 @@
 #include "../sensors_summary_ui.h"
 
 static lv_obj_t *root_page = NULL;
-static lv_obj_t *chart;
-static lv_chart_series_t *series_list;
-static lv_timer_t *timer;
+static lv_obj_t *chart_temp;
+static lv_obj_t *arc_temp;
+static lv_obj_t *arc_temp;
+static lv_obj_t *label_current_temp;
+static lv_obj_t *label_max_temp;
+static lv_obj_t *label_min_temp;
+static lv_chart_series_t *series;
+static int8_t max_temperature;
+static int8_t min_temperature;
 
-static int counter = 0;
-static int16_t testsignal[] = {
-20,
-23,
-25,
-27,
-30,
-32,
-34,
-35,
-37,
-38,
-39,
-40,
-40,
-40,
-40,
-39,
-38,
-37,
-35,
-34,
-32,
-30,
-27,
-25,
-23,
-20,
-18,
-15,
-13,
-10,
-8,
-6,
-5,
-3,
-2,
-1,
-0,
-0,
-0,
-0,
-1,
-2,
-3,
-5,
-6,
-8,
-10,
-13,
-15,
-17,
-};
-
-static void draw_event_cb(lv_event_t *e)
+static void on_TemperatureScreen_Draw(lv_event_t *e)
 {
     lv_obj_t *obj = lv_event_get_target(e);
 
     // Add the faded area before the lines are drawn.
     lv_obj_draw_part_dsc_t *dsc = lv_event_get_draw_part_dsc(e);
     if (dsc->part == LV_PART_ITEMS) {
+        lv_area_t a;
+        lv_draw_rect_dsc_t draw_rect_dsc;
+        lv_draw_mask_line_param_t line_mask_param;
+        int16_t line_mask_id;
+
         if (!dsc->p1 || !dsc->p2) {
             return;
         }
 
         // Add a line mask that keeps the area below the line.
-        lv_draw_mask_line_param_t line_mask_param;
         lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
                                       LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-        int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
+        line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
 
         // Draw a rectangle that will be affected by the mask.
-        lv_draw_rect_dsc_t draw_rect_dsc;
-
         lv_draw_rect_dsc_init(&draw_rect_dsc);
         draw_rect_dsc.bg_opa = LV_OPA_50;
         draw_rect_dsc.bg_color = lv_color_hex(0x9EC8F6);
 
-        lv_area_t a;
         a.x1 = dsc->p1->x;
         a.x2 = dsc->p2->x - 1;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
@@ -99,15 +52,11 @@ static void draw_event_cb(lv_event_t *e)
     }
 }
 
-static void add_data(lv_timer_t *timer)
+lv_obj_t *Sensors_Summary_TemperatureScreen_Init(int8_t InitTemp)
 {
-    LV_UNUSED(timer);
-    lv_chart_set_next_value(chart, series_list, testsignal[counter++]);
-    counter = counter % 50;
-}
+    max_temperature = InitTemp;
+    min_temperature = InitTemp;
 
-lv_obj_t *Sensors_Summary_TemperatureScreen_Init(void)
-{
     root_page = lv_obj_create(NULL);
 
     lv_obj_clear_flag(root_page, LV_OBJ_FLAG_SCROLLABLE);
@@ -115,35 +64,87 @@ lv_obj_t *Sensors_Summary_TemperatureScreen_Init(void)
     lv_obj_set_size(root_page, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_bg_color(root_page, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    chart = lv_chart_create(root_page);
-    lv_obj_set_size(chart, 260, 200);
-    lv_obj_set_pos(chart, -10, 60);
-    lv_obj_set_style_line_width(chart, 0, LV_PART_ITEMS);
-    lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
+    arc_temp = lv_arc_create(root_page);
+    lv_obj_set_width(arc_temp, 220);
+    lv_obj_set_height(arc_temp, 220);
+    lv_obj_set_align(arc_temp, LV_ALIGN_CENTER);
+    lv_arc_set_range(arc_temp, -20, 60);
+    lv_arc_set_value(arc_temp, 0);
+    lv_arc_set_bg_angles(arc_temp, 185, 355);
+    lv_obj_remove_style(arc_temp, NULL, LV_PART_KNOB);
 
-    lv_obj_set_style_bg_color(chart, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(chart, lv_color_hex(0x30343F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    chart_temp = lv_chart_create(root_page);
+    lv_obj_set_size(chart_temp, 260, 80);
+    lv_obj_set_pos(chart_temp, -10, 90);
+    lv_obj_set_style_line_width(chart_temp, 0, LV_PART_ITEMS);
+    lv_obj_set_style_size(chart_temp, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(chart_temp, lv_obj_get_style_bg_color(root_page, LV_PART_MAIN | LV_STATE_DEFAULT), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(chart_temp, lv_obj_get_style_bg_color(root_page, LV_PART_MAIN | LV_STATE_DEFAULT), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(chart_temp, on_TemperatureScreen_Draw, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
-    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    label_current_temp = lv_label_create(root_page);
+    lv_obj_set_width(label_current_temp, LV_SIZE_CONTENT);
+    lv_obj_set_height(label_current_temp, LV_SIZE_CONTENT); 
+    lv_obj_set_x(label_current_temp, 0);
+    lv_obj_set_y(label_current_temp, -60);
+    lv_obj_set_align(label_current_temp, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_color(label_current_temp, lv_color_hex(0xFFBAAF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(label_current_temp, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(label_current_temp, &lv_font_montserrat_42, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-    lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, -20, 60);
-    lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_CIRCULAR);
-    lv_chart_set_div_line_count(chart, 0, 0);
-    lv_chart_set_point_count(chart, 50);
+    label_min_temp = lv_label_create(root_page);
+    lv_obj_set_width(label_min_temp, LV_SIZE_CONTENT);
+    lv_obj_set_height(label_min_temp, LV_SIZE_CONTENT); 
+    lv_obj_set_x(label_min_temp, -20);
+    lv_obj_set_y(label_min_temp, -25);
+    lv_obj_set_align(label_min_temp, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_color(label_min_temp, lv_color_hex(0xFFBAAF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(label_min_temp, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 0, 5, 5, true, 50);
+    label_max_temp = lv_label_create(root_page);
+    lv_obj_set_width(label_max_temp, LV_SIZE_CONTENT);
+    lv_obj_set_height(label_max_temp, LV_SIZE_CONTENT); 
+    lv_obj_set_x(label_max_temp, 20);
+    lv_obj_set_y(label_max_temp, -25);
+    lv_obj_set_align(label_max_temp, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_color(label_max_temp, lv_color_hex(0xFFBAAF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(label_max_temp, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    series_list = lv_chart_add_series(chart, lv_color_hex(0x9EC8F6), LV_CHART_AXIS_SECONDARY_Y);
+    lv_chart_set_type(chart_temp, LV_CHART_TYPE_LINE);
+    lv_chart_set_range(chart_temp, LV_CHART_AXIS_PRIMARY_Y, -20, 60);
+    lv_chart_set_update_mode(chart_temp, LV_CHART_UPDATE_MODE_CIRCULAR);
+    lv_chart_set_div_line_count(chart_temp, 0, 0);
+    lv_chart_set_point_count(chart_temp, 50);
+    lv_chart_set_axis_tick(chart_temp, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 5, true, 50);
 
-    timer = lv_timer_create(add_data, 100, NULL);
+    series = lv_chart_add_series(chart_temp, lv_color_hex(0x9EC8F6), LV_CHART_AXIS_PRIMARY_Y);
+
+    Sensors_Summary_TemperatureScreen_Add(InitTemp);
 
     return root_page;
 }
 
 void Sensors_Summary_TemperatureScreen_Remove(void)
 {
-    lv_timer_del(timer);
     lv_obj_del(root_page);
     root_page = NULL;
+}
+
+void Sensors_Summary_TemperatureScreen_Add(int8_t Temperature)
+{
+    if(Temperature > max_temperature)
+    {
+        max_temperature = Temperature;
+    }
+
+    if(Temperature < min_temperature)
+    {
+        min_temperature = Temperature;
+    }
+
+    lv_label_set_text_fmt(label_current_temp, "%i°", Temperature);
+    lv_label_set_text_fmt(label_max_temp, "%i°", max_temperature);
+    lv_label_set_text_fmt(label_min_temp, "%i°", min_temperature);
+    lv_arc_set_value(arc_temp, Temperature);
+    lv_chart_set_next_value(chart_temp, series, Temperature);
 }
