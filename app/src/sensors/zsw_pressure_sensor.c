@@ -110,7 +110,7 @@ int zsw_pressure_sensor_get_temperature(float *temperature)
         return -ENODATA;
     }
 
-    if (sensor_channel_get(bmp581, SENSOR_CHAN_DIE_TEMP, &sensor_val) != 0) {
+    if (sensor_channel_get(bmp581, SENSOR_CHAN_AMBIENT_TEMP, &sensor_val) != 0) {
         return -ENODATA;
     }
 
