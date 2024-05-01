@@ -12,7 +12,7 @@ typedef enum {
 /** @brief
  *  @param entry
 */
-void Sensors_Summary_UI_Init(lv_obj_t *entry);
+void Sensors_Summary_UI_Init(lv_obj_t *entry, float InitTemp);
 
 /** @brief
 */
@@ -31,16 +31,17 @@ Sensors_Summary_Screen_t Sensors_Summary_UI_GetCurrentScreen(void);
 /** @brief
  *  @return
 */
-lv_obj_t* Sensors_Summary_HomeScreen_Init(void);
+lv_obj_t *Sensors_Summary_HomeScreen_Init(void);
 
 /** @brief
 */
 void Sensors_Summary_HomeScreen_Remove(void);
 
 /** @brief
+ *  @param InitTemp
  *  @return
 */
-lv_obj_t* Sensors_Summary_TemperatureScreen_Init(void);
+lv_obj_t *Sensors_Summary_TemperatureScreen_Init(float InitTemp);
 
 /** @brief
 */
@@ -49,12 +50,12 @@ void Sensors_Summary_TemperatureScreen_Remove(void);
 /** @brief
  *  @param Temperature
 */
-void Sensors_Summary_TemperatureScreen_Add(int8_t Temperature);
+void Sensors_Summary_TemperatureScreen_Add(float Temperature);
 
 /** @brief
  *  @return
 */
-lv_obj_t* Sensors_Summary_PressureScreen_Init(void);
+lv_obj_t *Sensors_Summary_PressureScreen_Init(void);
 
 /** @brief
 */
@@ -63,7 +64,7 @@ void Sensors_Summary_HumidityScreen_Remove(void);
 /** @brief
  *  @return
 */
-lv_obj_t* Sensors_Summary_HumidityScreen_Init(void);
+lv_obj_t *Sensors_Summary_HumidityScreen_Init(void);
 
 /** @brief
 */

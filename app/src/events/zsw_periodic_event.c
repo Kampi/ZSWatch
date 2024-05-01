@@ -4,14 +4,12 @@
 
 #include "events/periodic_event.h"
 
-#define PERIODIC_FAST_INTERVAL_MS 100
-#define PERIODIC_MID_INTERVAL_MS 1000
-#define PERIODIC_SLOW_INTERVAL_MS 10000
+#define PERIODIC_100MS_INTERVAL_MS  100
+#define PERIODIC_1S_INTERVAL_MS     1000
+#define PERIODIC_10S_INTERVAL_MS    10000
+#define PERIODIC_60S_INTERVAL_MS    60000
 
-static void handle_slow_timeout(struct k_work *item);
-static void handle_fast_timeout(struct k_work *item);
-static void handle_mid_timeout(struct k_work *item);
-
+ZBUS_CHAN_DECLARE(periodic_event_60s_chan);
 ZBUS_CHAN_DECLARE(periodic_event_10s_chan);
 ZBUS_CHAN_DECLARE(periodic_event_1s_chan);
 ZBUS_CHAN_DECLARE(periodic_event_100ms_chan);
@@ -31,12 +29,14 @@ int zsw_periodic_chan_add_obs(const struct zbus_channel *chan, const struct zbus
     work = (struct k_work_delayable *)zbus_chan_user_data(chan);
     __ASSERT(work != NULL, "Invalid channel");
     if (!k_work_delayable_is_pending(work)) {
-        if (chan == &periodic_event_10s_chan) {
-            ret =  k_work_reschedule(work, K_MSEC(PERIODIC_SLOW_INTERVAL_MS));
+        if (chan == &periodic_event_60s_chan) {
+            ret = k_work_reschedule(work, K_MSEC(PERIODIC_60S_INTERVAL_MS));
+        } else if (chan == &periodic_event_10s_chan) {
+            ret = k_work_reschedule(work, K_MSEC(PERIODIC_10S_INTERVAL_MS));
         } else if (chan == &periodic_event_1s_chan) {
-            ret =  k_work_reschedule(work, K_MSEC(PERIODIC_MID_INTERVAL_MS));
+            ret = k_work_reschedule(work, K_MSEC(PERIODIC_1S_INTERVAL_MS));
         } else if (chan == &periodic_event_100ms_chan) {
-            ret =  k_work_reschedule(work, K_MSEC(PERIODIC_FAST_INTERVAL_MS));
+            ret = k_work_reschedule(work, K_MSEC(PERIODIC_100MS_INTERVAL_MS));
         } else {
             __ASSERT(false, "Unknown channel");
         }
@@ -58,40 +58,53 @@ int zsw_periodic_chan_rm_obs(const struct zbus_channel *chan, const struct zbus_
     return ret;
 }
 
-static void handle_slow_timeout(struct k_work *item)
+static void handle_60s_timeout(struct k_work *item)
 {
-    struct periodic_event evt = {
-    };
+    struct periodic_event evt;
     struct k_work_delayable *work = NULL;
+
+    zbus_chan_claim(&periodic_event_60s_chan, K_FOREVER);
+    work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_60s_chan);
+    k_work_reschedule(work, K_MSEC(PERIODIC_60S_INTERVAL_MS));
+    zbus_chan_finish(&periodic_event_60s_chan);
+
+    zbus_chan_pub(&periodic_event_60s_chan, &evt, K_MSEC(250));
+}
+
+static void handle_10s_timeout(struct k_work *item)
+{
+    struct periodic_event evt;
+    struct k_work_delayable *work = NULL;
+
     zbus_chan_claim(&periodic_event_10s_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_10s_chan);
-    k_work_reschedule(work, K_MSEC(PERIODIC_SLOW_INTERVAL_MS));
+    k_work_reschedule(work, K_MSEC(PERIODIC_10S_INTERVAL_MS));
     zbus_chan_finish(&periodic_event_10s_chan);
 
     zbus_chan_pub(&periodic_event_10s_chan, &evt, K_MSEC(250));
 }
 
-static void handle_mid_timeout(struct k_work *item)
+static void handle_1s_timeout(struct k_work *item)
 {
-    struct periodic_event evt = {
-    };
+    struct periodic_event evt;
     struct k_work_delayable *work = NULL;
+
     zbus_chan_claim(&periodic_event_1s_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_1s_chan);
-    k_work_reschedule(work, K_MSEC(PERIODIC_MID_INTERVAL_MS));
+    k_work_reschedule(work, K_MSEC(PERIODIC_1S_INTERVAL_MS));
     zbus_chan_finish(&periodic_event_1s_chan);
 
     zbus_chan_pub(&periodic_event_1s_chan, &evt, K_MSEC(250));
 }
 
-static void handle_fast_timeout(struct k_work *item)
+static void handle_100ms_timeout(struct k_work *item)
 {
-    struct periodic_event evt = {
-    };
+    struct periodic_event evt;
     struct k_work_delayable *work = NULL;
+
     zbus_chan_claim(&periodic_event_100ms_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_100ms_chan);
-    k_work_reschedule(work, K_MSEC(PERIODIC_FAST_INTERVAL_MS));
+    k_work_reschedule(work, K_MSEC(PERIODIC_100MS_INTERVAL_MS));
     zbus_chan_finish(&periodic_event_100ms_chan);
 
     zbus_chan_pub(&periodic_event_100ms_chan, &evt, K_MSEC(250));
@@ -100,19 +113,25 @@ static void handle_fast_timeout(struct k_work *item)
 static int zsw_timer_init(void)
 {
     struct k_work_delayable *work = NULL;
+
+    zbus_chan_claim(&periodic_event_60s_chan, K_FOREVER);
+    work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_60s_chan);
+    k_work_init_delayable(work, handle_60s_timeout);
+    zbus_chan_finish(&periodic_event_60s_chan);
+
     zbus_chan_claim(&periodic_event_10s_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_10s_chan);
-    k_work_init_delayable(work, handle_slow_timeout);
+    k_work_init_delayable(work, handle_10s_timeout);
     zbus_chan_finish(&periodic_event_10s_chan);
 
     zbus_chan_claim(&periodic_event_1s_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_1s_chan);
-    k_work_init_delayable(work, handle_mid_timeout);
+    k_work_init_delayable(work, handle_1s_timeout);
     zbus_chan_finish(&periodic_event_1s_chan);
 
     zbus_chan_claim(&periodic_event_100ms_chan, K_FOREVER);
     work = (struct k_work_delayable *)zbus_chan_user_data(&periodic_event_100ms_chan);
-    k_work_init_delayable(work, handle_fast_timeout);
+    k_work_init_delayable(work, handle_100ms_timeout);
     zbus_chan_finish(&periodic_event_100ms_chan);
     return 0;
 }

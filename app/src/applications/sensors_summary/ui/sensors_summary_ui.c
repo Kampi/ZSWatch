@@ -7,11 +7,11 @@ static lv_obj_t *root_page_humidity;
 static lv_obj_t *root_page_pressure;
 static Sensors_Summary_Screen_t CurrentScreen;
 
-void Sensors_Summary_UI_Init(lv_obj_t *entry)
+void Sensors_Summary_UI_Init(lv_obj_t *entry, float InitTemp)
 {
     entry_screen = entry;
     root_page_home = Sensors_Summary_HomeScreen_Init();
-    root_page_temperature = Sensors_Summary_TemperatureScreen_Init();
+    root_page_temperature = Sensors_Summary_TemperatureScreen_Init(InitTemp);
     root_page_humidity = Sensors_Summary_HumidityScreen_Init();
     root_page_pressure = Sensors_Summary_PressureScreen_Init();
     lv_disp_load_scr(root_page_home);
@@ -31,31 +31,29 @@ void Sensors_Summary_UI_ChangeScreen(Sensors_Summary_Screen_t Screen)
 {
     lv_obj_t *page;
 
-    if(CurrentScreen == Screen)
-    {
+    if (CurrentScreen == Screen) {
         return;
     }
 
     CurrentScreen = Screen;
 
-    switch(CurrentScreen)
-    {
-    case SENSORS_SUMMARY_SCREEN_TEMPERATURE: {
-        page = root_page_temperature;
-        break;
-    }
-    case SENSORS_SUMMARY_SCREEN_HUMIDITY: {
-        page = root_page_humidity;
-        break;
-    }
-    case SENSORS_SUMMARY_SCREEN_PRESSURE: {
-        page = root_page_pressure;
-        break;
-    }
-    default: {
-        page = root_page_home;
-        break;
-    }
+    switch (CurrentScreen) {
+        case SENSORS_SUMMARY_SCREEN_TEMPERATURE: {
+            page = root_page_temperature;
+            break;
+        }
+        case SENSORS_SUMMARY_SCREEN_HUMIDITY: {
+            page = root_page_humidity;
+            break;
+        }
+        case SENSORS_SUMMARY_SCREEN_PRESSURE: {
+            page = root_page_pressure;
+            break;
+        }
+        default: {
+            page = root_page_home;
+            break;
+        }
     }
 
     lv_scr_load_anim(page, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, false);
