@@ -1,0 +1,62 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+:root {
+  --zswatch-primary: #FFBAAF;
+  --zswatch-secondary: #9EC8F6;
+  --zswatch-dark: #495060;
+  --zswatch-darker: #30343F;
+  --ifm-navbar-background-color: var(--zswatch-primary);
+  --ifm-navbar-link-color: var(--zswatch-darker);
+  --ifm-navbar-link-hover-color: var(--zswatch-secondary);
+}
+
+.hero--primary {
+  --ifm-hero-background-color: var(--zswatch-darker);
+  --ifm-hero-text-color: var(--zswatch-secondary);
+}
+
+
+.toggleButton_gllP {
+  color: var(--zswatch-darker);
+}
+
+.menu__link {
+  color: var(--zswatch-darker);
+}
+
+.menu__link:hover {
+  color: #9EC8F6;
+}
+
+.menu__link--active {
+  color: #6d7383;
+}
+
+.navbar__toggle.clean-btn {
+  color: var(--zswatch-darker);
+}
+
+.navbar__toggle.clean-btn:hover {
+  color: #9EC8F6;
+}
+
+.navbar-sidebar__close {
+  color: var(--zswatch-darker);
+  --ifm-color-emphasis-600: var(--zswatch-darker);;
+}
+
+.menu_SIkG {
+  background-color: var(--zswatch-primary);
+}
+
+.menu__caret {
+  color: var(--zswatch-darker);
+}
+
+.navbar-sidebar__back {
+  color: var(--zswatch-darker);
+}
